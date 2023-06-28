@@ -8,6 +8,12 @@ openeuler_task:
     image: ghcr.io/grimbough/bioc-with-tinytex:devel-arm64
     cpu: 4
     memory: 12G
+  dependencies_cache:
+    folder: /R-lib
+    fingerprint_script: |
+      pwd
+      ls -la
+      cat DESCRIPTION
   setup_script: |
     echo "Setting up ..."
     uname -a
@@ -19,4 +25,3 @@ openeuler_task:
             -e 'BiocManager::install(pkgs$package, update = TRUE, ask = FALSE)'
   test_script: |
     echo "Running the tests..."
-
