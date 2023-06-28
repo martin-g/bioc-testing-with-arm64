@@ -1,0 +1,21 @@
+env:
+  R_LIBS_USER: /R-lib
+
+openeuler_task:
+  name: Build Bioc package on aarch64
+  timeout_in: 120m
+  arm_container:
+    image: ghcr.io/grimbough/bioc-with-tinytex:devel-arm64
+    cpu: 4
+    memory: 12G
+  setup_script: |
+    echo "Setting up ..."
+    uname -a
+    lscpu
+  build_script: |
+    pwd
+    echo "options(Ncpus=2L, timeout = 300)" >> ~/.Rprofile
+    Rscript -e 'pkgs <- remotes::dev_package_deps("examplePKG", dependencies = TRUE)' \
+            -e 'BiocManager::install(pkgs$package, update = TRUE, ask = FALSE)'
+  test_script: |
+    echo "Running the tests..."
