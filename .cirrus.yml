@@ -41,6 +41,6 @@ openeuler_task:
     install_out_artifacts:
       path: "**/*.install-out.txt"
     Rcheck_artifacts:
-      path: "**/*.Rcheck"
+      path: "**/*.Rcheck/*"
     package_artifacts:
       path: "**/*.tar.gz"
