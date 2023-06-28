@@ -13,9 +13,12 @@ openeuler_task:
     fingerprint_script: cat examplePKG/DESCRIPTION
   setup_script: |
     echo "options(Ncpus=2L, timeout = 300)" >> ~/.Rprofile
-  bioc_manager_install_script: |
+    mkdir -p ${R_LIBS_USER}
+  BiocManager_install_script: |
+    ls -la ${R_LIBS_USER}
     Rscript -e 'pkgs <- remotes::dev_package_deps("examplePKG", dependencies = TRUE)' \
             -e 'BiocManager::install(pkgs$package, update = TRUE, ask = FALSE)'
+    ls -la ${R_LIBS_USER}
   CMD_INSTALL_script: |
     ## Install and store the log like on the BioC Build System
     R CMD INSTALL examplePKG &> examplePKG.install-out.txt
@@ -33,9 +36,10 @@ openeuler_task:
     ## build a package binary for Linux ARM64
     mkdir -p examplePKG.buildbin-libdir
     R CMD INSTALL --build --library=examplePKG.buildbin-libdir examplePKG*.tar.gz
-  package_artifacts:
-    path: "**/*.tar.gz"
-  install_out_artifacts:
-    path: "**/*.install-out.txt"
-  Rcheck_artifacts:
-    path: "**/*.Rcheck"
+  always:
+    install_out_artifacts:
+      path: "**/*.install-out.txt"
+    Rcheck_artifacts:
+      path: "**/*.Rcheck"
+    package_artifacts:
+      path: "**/*.tar.gz"
