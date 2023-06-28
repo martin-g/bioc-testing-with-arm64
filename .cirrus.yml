@@ -19,3 +19,4 @@ openeuler_task:
             -e 'BiocManager::install(pkgs$package, update = TRUE, ask = FALSE)'
   test_script: |
     echo "Running the tests..."
+
