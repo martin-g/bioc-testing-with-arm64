@@ -16,8 +16,7 @@ openeuler_task:
     mkdir -p ${R_LIBS_USER}
   BiocManager_install_script: |
     Rscript -e 'pkgs <- remotes::dev_package_deps("examplePKG", dependencies = TRUE)' \
-            -e 'BiocManager::install(pkgs$package, update = TRUE, ask = FALSE)' \
-            -e 'BiocManager::install(c("BiocStyle"), update = TRUE, ask = FALSE)'
+            -e 'BiocManager::install(pkgs$package, update = TRUE, ask = FALSE)'
     if [ $? -eq  1 ]; then exit 1; fi
   CMD_INSTALL_script: |
     ## Install and store the log like on the BioC Build System
@@ -40,6 +39,6 @@ openeuler_task:
     install_out_artifacts:
       path: "**/*.install-out.txt"
     Rcheck_artifacts:
-      path: "**/*.Rcheck/*"
+      path: "**/*.Rcheck/**/*"
     package_artifacts:
       path: "**/*.tar.gz"
