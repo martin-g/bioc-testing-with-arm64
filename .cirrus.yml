@@ -17,11 +17,11 @@ openeuler_task:
   BiocManager_install_script: |
     Rscript -e 'pkgs <- remotes::dev_package_deps("examplePKG", dependencies = TRUE)' \
             -e 'BiocManager::install(pkgs$package, update = TRUE, ask = FALSE)'
-    if [ $? -eq  1 ]; then exit 1; fi
+    if [ $? -ne  0 ]; then exit 1; fi
   CMD_INSTALL_script: |
     ## Install and store the log like on the BioC Build System
     R CMD INSTALL examplePKG &> examplePKG.install-out.txt
-    if [ $? -eq  1 ]; then
+    if [ $? -ne  0 ]; then
       cat examplePKG.install-out.txt
       exit 1;
     fi
