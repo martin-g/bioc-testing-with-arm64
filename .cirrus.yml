@@ -8,14 +8,37 @@ openeuler_task:
     image: ghcr.io/grimbough/bioc-with-tinytex:devel-arm64
     cpu: 4
     memory: 12G
+  dependencies_cache:
+    folder: /R-lib
+    fingerprint_script: cat examplePKG/DESCRIPTION
   setup_script: |
-    echo "Setting up ..."
-    uname -a
-    lscpu
-  build_script: |
-    pwd
     echo "options(Ncpus=2L, timeout = 300)" >> ~/.Rprofile
+    mkdir -p ${R_LIBS_USER}
+  BiocManager_install_script: |
     Rscript -e 'pkgs <- remotes::dev_package_deps("examplePKG", dependencies = TRUE)' \
             -e 'BiocManager::install(pkgs$package, update = TRUE, ask = FALSE)'
-  test_script: |
-    echo "Running the tests..."
+    if [ $? -ne  0 ]; then exit 1; fi
+  CMD_INSTALL_script: |
+    ## Install and store the log like on the BioC Build System
+    R CMD INSTALL examplePKG &> examplePKG.install-out.txt
+    if [ $? -ne  0 ]; then
+      cat examplePKG.install-out.txt
+      exit 1;
+    fi
+  CMD_build_script: |  
+    ## build the package
+    R CMD build --keep-empty-dirs --no-resave-data examplePKG
+  CMD_check_script: |  
+    ## Check the package using the shortcut from the BBS
+    R CMD check --install=check:examplePKG.install-out.txt --library="${R_LIBS_USER}" --no-vignettes --timings examplePKG*.tar.gz
+  CMD_INSTALL_binary_script: |  
+    ## build a package binary for Linux ARM64
+    mkdir -p examplePKG.buildbin-libdir
+    R CMD INSTALL --build --library=examplePKG.buildbin-libdir examplePKG*.tar.gz
+  always:
+    install_out_artifacts:
+      path: "**/*.install-out.txt"
+    Rcheck_artifacts:
+      path: "**/*.Rcheck/**/*"
+    package_artifacts:
+      path: "**/*.tar.gz"
